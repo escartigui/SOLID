@@ -128,7 +128,7 @@ class Manipulacionclientes:
 
     def agregar(self):
         try:
-            cantidad = int(input("Ingrese la cantidad de productos: "))
+            cantidad = int(input("Ingrese la cantidad de clientes: "))
             for i in range(cantidad):
                 print(f"Clientes{i+1}")
                 nit = input("Ingrese el nit del cliente: ").lower()
@@ -194,4 +194,41 @@ class ManipulacionProveedores:
                     return
         except ValueError:
             print("Verifica lo ingresado")
-class
+class ManipulacionEmpleados:
+    def __init__(self):
+            self.empleados = {}
+
+    def agregar(self):
+            try:
+                cantidad = int(input("Ingrese la cantidad de empleados: "))
+                for i in range(cantidad):
+                    print(f"Clientes{i + 1}")
+                    idempleado = input("Ingrese el id del empleado: ").lower()
+                    if idempleado.lower() in self.empleados:
+                        print("El nit ya existe")
+                        return
+                    if idempleado.strip() == "":
+                        print("El nit no puede quedar vacio")
+                        return
+                    nombre = input("Ingrese el nombre del producto")
+                    if nombre.strip() == "":
+                        print("No puede quedar vacio")
+                        return
+                    direccion = input("Ingrese la direccion del cliente: ")
+                    if direccion.strip() == "":
+                        print("No puede quedar vacio")
+                        return
+                    telefono = int(input("Ingrese el numero de telefono del cliente: "))
+                    if telefono == "":
+                        print("No puede quedar vacio")
+                        return
+                    correo = input("Ingrese la correo del cliente: ")
+                    if correo.strip() == "":
+                        print("No puede quedar vacio")
+                        return
+                    puesto = input("Ingrese el puesto: ")
+                    if puesto.strip() == "":
+                        print("No puede quedar vacio")
+                        return
+            except ValueError:
+                print("Verifica lo ingresado")
