@@ -24,7 +24,23 @@ class Producto:
 class RepositorioCategorias:
     def __init__(self):
         self.categorias = {}
+        self.cargar_categorias()
 
+    def cargar_categorias(self):
+        try:
+            with open("categorias.txt", "r", encoding="utf-8") as archivo:
+                for linea in archivo:
+                    linea = linea.strip()
+                    if linea :
+                        id_categoria, nombre = linea.split(":")
+                        self.categorias[id_categoria] = {
+                            "id_categoria": id_categoria,
+                            "nombre": nombre
+                        }
+
+            print("Categorias cargadas")
+        except FileNotFoundError:
+            print("No existe, se va a crear el archivo al guardar")
     def agregar(self, categoria: Categoria):
         if categoria.id_categoria in self.categorias:
             raise ValueError("El ID de categoría ya existe")
@@ -57,24 +73,22 @@ class RepositorioProductos:
         return list(self.productos.values())
 
 
-# --- ORDENAMIENTO (sin lambda) ---
-def funcion_nombre(producto):
-    return producto.nombre.lower()
-
-def funcion_precio(producto):
-    return producto.precio
-
-def funcion_stock(producto):
-    return producto.stock
-
-def ordenar_productos(productos, criterio):
-    if criterio == "nombre":
+# --- ORDENAMIENTO ---
+class Ordenamiento:
+    def por_nombre(self, productos):
+        def funcion_nombre(producto):
+            return producto.nombre.lower()
         return sorted(productos, key=funcion_nombre)
-    elif criterio == "precio":
+
+    def por_precio(self, productos):
+        def funcion_precio(producto):
+            return producto.precio
         return sorted(productos, key=funcion_precio)
-    elif criterio == "stock":
+
+    def por_stock(self, productos):
+        def funcion_stock(producto):
+            return producto.stock
         return sorted(productos, key=funcion_stock)
-    return productos
 
 
 # --- MENÚ ---
@@ -82,6 +96,7 @@ class Menu:
     def __init__(self):
         self.repo_categorias = RepositorioCategorias()
         self.repo_productos = RepositorioProductos()
+        self.ordenamiento = Ordenamiento()  # instanciamos la clase Ordenamiento
 
     # --- CATEGORÍAS ---
     def agregar_categoria(self):
@@ -140,17 +155,16 @@ class Menu:
     def listar_productos_ordenados(self):
         print("Ordenar por: 1.Nombre 2.Precio 3.Stock")
         opcion = input("Seleccione opción: ").strip()
-        criterio = ""
-        if opcion == "1":
-            criterio = "nombre"
-        elif opcion == "2":
-            criterio = "precio"
-        elif opcion == "3":
-            criterio = "stock"
-        else:
-            print("Opción inválida.")
-            return
-        productos = ordenar_productos(self.repo_productos.listar(), criterio)
+        match opcion:
+            case "1":
+                productos = self.ordenamiento.por_nombre(self.repo_productos.listar())
+            case "2":
+                productos = self.ordenamiento.por_precio(self.repo_productos.listar())
+            case "3":
+                productos = self.ordenamiento.por_stock(self.repo_productos.listar())
+            case _:
+                print("Opción inválida.")
+                return
         for p in productos:
             print(p.mostrar())
 
@@ -194,24 +208,25 @@ class Menu:
             print("8. Salir")
 
             opcion = input("Seleccione opción: ").strip()
-            if opcion == "1":
-                self.agregar_categoria()
-            elif opcion == "2":
-                self.listar_categorias()
-            elif opcion == "3":
-                self.agregar_producto()
-            elif opcion == "4":
-                self.listar_productos()
-            elif opcion == "5":
-                self.listar_productos_ordenados()
-            elif opcion == "6":
-                self.actualizar_producto()
-            elif opcion == "7":
-                self.eliminar_producto()
-            elif opcion == "8":
-                break
-            else:
-                print("Opción no válida.")
+            match opcion:
+                case "1":
+                    self.agregar_categoria()
+                case "2":
+                    self.listar_categorias()
+                case "3":
+                    self.agregar_producto()
+                case "4":
+                    self.listar_productos()
+                case "5":
+                    self.listar_productos_ordenados()
+                case "6":
+                    self.actualizar_producto()
+                case "7":
+                    self.eliminar_producto()
+                case "8":
+                    break
+                case _:
+                    print("Opción no válida.")
 
 
 # --- EJECUCIÓN ---
