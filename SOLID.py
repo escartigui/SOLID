@@ -120,6 +120,7 @@ class ManipulacionProducto:
                     if stock.strip() == "":
                         print("No puede quedar vacio")
                         return
+                    self.productos[codigo] = Productos(codigo, nombre,idcategoria, precio, totalcompra, totalventa,stock)
         except ValueError:
             print("Verifica lo ingresado")
 class Manipulacionclientes:
@@ -154,6 +155,7 @@ class Manipulacionclientes:
                 if correo.strip() == "":
                     print("No puede quedar vacio")
                     return
+                self.clientes[nit] = Clientes(nit,nombre, direccion, telefono, correo)
         except ValueError:
             print("Verifica lo ingresado")
 class ManipulacionProveedores:
@@ -192,6 +194,7 @@ class ManipulacionProveedores:
                 if empresa.strip() == "":
                     print("No puede quedar vacio")
                     return
+                self.proveedores[nit] = Proveedores(nit,nombre, direccion, telefono, correo,empresa)
         except ValueError:
             print("Verifica lo ingresado")
 class ManipulacionEmpleados:
@@ -230,5 +233,6 @@ class ManipulacionEmpleados:
                     if puesto.strip() == "":
                         print("No puede quedar vacio")
                         return
+                    self.empleados[idempleado] = Empleados(idempleado,nombre, direccion, telefono, correo,puesto)
             except ValueError:
                 print("Verifica lo ingresado")
