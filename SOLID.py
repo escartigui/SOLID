@@ -444,7 +444,6 @@ class VentaService:
     def iniciar_venta(self):
         nit = input("Ingrese el nit del cliente: ").strip()
         if nit.upper() == "CF":
-            # Si el NIT es 'CF', no validamos la existencia del cliente
             pass
         else:
             cliente = self.cliente_service.obtener(nit)
@@ -573,16 +572,21 @@ class Ordenamiento:
     def por_nombre(productos):
         def funcion_nom(producto):
             return producto.nombre.lower()
+
         return sorted(productos, key=funcion_nom)
+
     @staticmethod
     def por_precio(productos):
         def funcion_precio(producto):
             return producto.precio
+
         return sorted(productos, key=funcion_precio)
+
     @staticmethod
     def por_stock(productos):
         def funcion_stock(producto):
             return producto.stock
+
         return sorted(productos, key=funcion_stock)
 class Menu:
     def __init__(self, categoria_service, producto_service, clientes_service, proveedor_service, empleado_service,
@@ -856,7 +860,6 @@ if __name__ == "__main__":
     repo_detalleventa = RepositorioDetalleVentaMemoria()
     repo_compra = RepositorioComprasMemoria()
     repo_detallecompra = RepositorioDetalleComprasMemoria()
-
     # Servicios
     categoria_service = CategoriaService(repo_categorias)
     producto_service = ProductoService(repo_productos, repo_categorias)
@@ -865,7 +868,6 @@ if __name__ == "__main__":
     empleado_service = EmpleadoService(repo_empleado)
     venta_service = VentaService(repo_venta, repo_detalleventa, clientes_service, empleado_service, producto_service)
     compra_service = CompraService(repo_compra, repo_detallecompra, proveedor_service, producto_service)
-
     # Menú principal (pasando los servicios al menú)
     menu = Menu(categoria_service, producto_service, clientes_service, proveedor_service, empleado_service,
                 venta_service, compra_service)
