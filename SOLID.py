@@ -1,4 +1,5 @@
 import datetime
+import os
 from abc import ABC, abstractmethod
 class Categoria:
     def __init__(self, idcategoria, nombre):
@@ -7,6 +8,12 @@ class Categoria:
 
     def mostrar_categoria(self):
         return f"Categoria:{self.idcategoria} Nombre:{self.nombre}"
+    def a_cadena(self):
+        return f"{self.idcategoria}:{self.nombre}"
+    @staticmethod
+    def desde_cadena(cadena):
+        idcategoria,nombre = cadena.strip().split(":")
+        return Categoria(idcategoria, nombre)
 class Productos:
     def __init__(self, idproducto, nombre, precio, idcategoria, stock=0):
         self.idproducto = idproducto
@@ -27,6 +34,12 @@ class Clientes:
 
     def mostrar_clientes(self):
         return f"Clientes: {self.nit}, {self.nombre}, {self.direccion}, {self.telefono}, {self.correo}"
+    def a_cadena(self):
+        return f"{self.nit}:{self.nombre}:{self.direccion}:{self.telefono}:{self.correo}"
+    @staticmethod
+    def desde_cadena(cadena):
+        nit, nombre,direccion, telefono, correo = cadena.strip().split(":")
+        return Clientes(nit,nombre,direccion,telefono,correo)
 class Proveedores:
     def __init__(self, niti, nombre, direccion, telefono, correo, empresa):
         self.niti = niti
@@ -588,6 +601,21 @@ class Ordenamiento:
             return producto.stock
 
         return sorted(productos, key=funcion_stock)
+class RepositorioClientesArchivo(IRepositorioClientes):
+    def __init__ (self, archivo_nombre = "Clientes.txt"):
+        self.archivo_nombre = archivo_nombre
+        self.clientes = {}
+        self.cargar_datos()
+    def cargar_datos(self):
+        if not os.path.isfile(self.archivo_nombre):
+            return
+        with open(self.archivo_nombre, "r", encoding = 'utf-8') as f:
+            for linea in f:
+                cliente = Clientes.desde_cadena(linea)
+                self.clientes[cliente.nit] = cliente
+    def guardar_datos(self):
+        with open(self.archivo_nombre, "w", encoding = 'utf-8') as f:
+            for clie
 class Menu:
     def __init__(self, categoria_service, producto_service, clientes_service, proveedor_service, empleado_service,
                  venta_service, compra_service):
