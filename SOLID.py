@@ -102,6 +102,12 @@ class DetalleCompras:
 
     def mostrar_detallecompra(self):
         return f"Detalle Id: {self.id_detallecompra},Compra Id: {self.idcompras},Producto: {self.idproducto},Cantidad: {self.cantidad},Costo Unicario: {self.costo_unitario},SubTotal: {self.subtotal}"
+class IRepositorioArchivo(ABC):
+    @abstractmethod
+    def cargar_datos(self):
+        pass
+    def guardar_datos(self):
+        pass
 class IRepositorioCompras(ABC):
     @abstractmethod
     def agregar(self, compra):
@@ -341,6 +347,20 @@ class RepositorioDetalleComprasMemoria(IRepositorioDetalleCompras):
 
     def obtener(self, id_detallecompra):
         return self.detalles.get(id_detallecompra)
+class RepositorioArchivo(IRepositorioArchivo, ABC):
+    def __init__(self, archivo_nombre,clase_modelo, Clave_modelo):
+        self.archivo_nombre = archivo_nombre
+        self.clase_modelo = clase_modelo
+        self.Clave_modelo = Clave_modelo
+        self.objetos = {}
+        self.cargar_datos()
+    def cargar_datos(self):
+        if not os.path.exists(self.archivo_nombre):
+            print(f"Archivo {self.archivo_nombre} no existe se creará")
+            return
+        with open(self.archivo_nombre, "r", encoding = 'utf-8') as f:
+            for linea in f:
+                objeto = self.
 class ClientesService:
     def __init__(self, repo_clientes):
         self.repo_clientes = repo_clientes
@@ -615,7 +635,38 @@ class RepositorioClientesArchivo(IRepositorioClientes):
                 self.clientes[cliente.nit] = cliente
     def guardar_datos(self):
         with open(self.archivo_nombre, "w", encoding = 'utf-8') as f:
-            for clie
+            for cliente in self.clientes.values():
+                f.write(cliente.a_cadena())
+    def agregar(self,cliente):
+        self.clientes[cliente.nit] = cliente
+        self.guardar_datos()
+    def listar(self):
+        return list(self.clientes. values())
+    def obtener(self,nit):
+        return self.clientes.get(nit)
+class RepositorioCategoriasArchivo(IRepositorioCategorias):
+    def __init__ (self, archivo_nombre = "Categorias.txt"):
+        self.archivo_nombre = archivo_nombre
+        self.categorias = {}
+        self.cargar_datos()
+    def cargar_datos(self):
+        if not os.path.isfile(self.archivo_nombre):
+            return
+        with open(self.archivo_nombre, "r", encoding = 'utf-8') as f:
+            for linea in f:
+                categoria = Categoria.desde_cadena(linea)
+                self.categorias[categoria.idcategoria] = categoria
+    def guardar_datos(self):
+        with open(self.archivo_nombre, "w", encoding = 'utf-8') as f:
+            for categoria in self.categorias.values():
+                f.write(categoria.a_cadena())
+    def agregar(self,categoria):
+        self.categorias[categoria.idcategoria] = categoria
+        self.guardar_datos()
+    def listar(self):
+        return list(self.categorias.values())
+    def ordenar(self,idcategoria):
+        return self.categorias.get(idcategoria)
 class Menu:
     def __init__(self, categoria_service, producto_service, clientes_service, proveedor_service, empleado_service,
                  venta_service, compra_service):
@@ -879,9 +930,9 @@ class Menu:
                 print("Verifica lo ingresado")
 if __name__ == "__main__":
     # Repositorios
-    repo_categorias = RepositorioCategoriasMemoria()
+    repo_categorias = RepositorioCategoriasArchivo()
     repo_productos = RepositorioProductosMemoria()
-    repo_clientes = RepositorioClientesMemoria()
+    repo_clientes = RepositorioClientesArchivo()
     repo_proveedor = RepositorioProveedoresMemoria()
     repo_empleado = RepositorioEmpleadosMemoria()
     repo_venta = RepositorioVentasMemoria()
