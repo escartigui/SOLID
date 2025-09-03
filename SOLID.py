@@ -348,10 +348,10 @@ class RepositorioDetalleComprasMemoria(IRepositorioDetalleCompras):
     def obtener(self, id_detallecompra):
         return self.detalles.get(id_detallecompra)
 class RepositorioArchivo(IRepositorioArchivo, ABC):
-    def __init__(self, archivo_nombre,clase_modelo, Clave_modelo):
+    def __init__(self, archivo_nombre,clase_modelo, clave_modelo):
         self.archivo_nombre = archivo_nombre
         self.clase_modelo = clase_modelo
-        self.Clave_modelo = Clave_modelo
+        self.clave_modelo = clave_modelo
         self.objetos = {}
         self.cargar_datos()
     def cargar_datos(self):
@@ -360,7 +360,22 @@ class RepositorioArchivo(IRepositorioArchivo, ABC):
             return
         with open(self.archivo_nombre, "r", encoding = 'utf-8') as f:
             for linea in f:
-                objeto = self.
+                objeto = self.clase_modelo.desde_cadena(linea)
+                key = getattr(objeto,self.clave_modelo)
+                self.objetos[key] = objeto
+        print(f"Datos de{self.archivo_nombre} cargado")
+    def guardar_datos(self):
+        with open(self.archivo_nombre, "w", encoding = 'utf-8') as f:
+            for objeto in self.objetos.values():
+                f.write(objeto.a_cadena())
+    def agregar(self,objeto):
+        key = getattr(objeto, self.clave_modelo)
+        self.objetos[key] = objeto
+        self.guardar_datos()
+    def listar(self):
+        return list(self.objetos.values())
+    def obtener(self,id_objeto):
+        return self.objetos.get(id_objeto)
 class ClientesService:
     def __init__(self, repo_clientes):
         self.repo_clientes = repo_clientes
@@ -621,52 +636,12 @@ class Ordenamiento:
             return producto.stock
 
         return sorted(productos, key=funcion_stock)
-class RepositorioClientesArchivo(IRepositorioClientes):
-    def __init__ (self, archivo_nombre = "Clientes.txt"):
-        self.archivo_nombre = archivo_nombre
-        self.clientes = {}
-        self.cargar_datos()
-    def cargar_datos(self):
-        if not os.path.isfile(self.archivo_nombre):
-            return
-        with open(self.archivo_nombre, "r", encoding = 'utf-8') as f:
-            for linea in f:
-                cliente = Clientes.desde_cadena(linea)
-                self.clientes[cliente.nit] = cliente
-    def guardar_datos(self):
-        with open(self.archivo_nombre, "w", encoding = 'utf-8') as f:
-            for cliente in self.clientes.values():
-                f.write(cliente.a_cadena())
-    def agregar(self,cliente):
-        self.clientes[cliente.nit] = cliente
-        self.guardar_datos()
-    def listar(self):
-        return list(self.clientes. values())
-    def obtener(self,nit):
-        return self.clientes.get(nit)
-class RepositorioCategoriasArchivo(IRepositorioCategorias):
-    def __init__ (self, archivo_nombre = "Categorias.txt"):
-        self.archivo_nombre = archivo_nombre
-        self.categorias = {}
-        self.cargar_datos()
-    def cargar_datos(self):
-        if not os.path.isfile(self.archivo_nombre):
-            return
-        with open(self.archivo_nombre, "r", encoding = 'utf-8') as f:
-            for linea in f:
-                categoria = Categoria.desde_cadena(linea)
-                self.categorias[categoria.idcategoria] = categoria
-    def guardar_datos(self):
-        with open(self.archivo_nombre, "w", encoding = 'utf-8') as f:
-            for categoria in self.categorias.values():
-                f.write(categoria.a_cadena())
-    def agregar(self,categoria):
-        self.categorias[categoria.idcategoria] = categoria
-        self.guardar_datos()
-    def listar(self):
-        return list(self.categorias.values())
-    def ordenar(self,idcategoria):
-        return self.categorias.get(idcategoria)
+class RepositorioClientesArchivo(RepositorioArchivo,IRepositorioClientes):
+    def __init__ (self):
+        super().__init__('clientes.txt', Clientes, 'nit')
+class RepositorioCategoriasArchivo(RepositorioArchivo,IRepositorioCategorias):
+    def __init__ (self):
+        super().__init__('Categorias.txt',Categoria,'idcategoria')
 class Menu:
     def __init__(self, categoria_service, producto_service, clientes_service, proveedor_service, empleado_service,
                  venta_service, compra_service):
